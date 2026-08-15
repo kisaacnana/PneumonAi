@@ -1,84 +1,192 @@
 # 🫁 PneumonAi
 
-### Pneumonia Detection from Chest X-Ray Images Using Convolutional Neural Networks
+### Pneumonia Classification from Chest X-Ray Images Using Deep Learning
 
-PneumonAi is a **deep-learning computer vision project** that explores the use of a Convolutional Neural Network (CNN) to classify chest X-ray images as **pneumonia** or **normal**.
+PneumonAi is a **computer vision and deep-learning project** that explores binary classification of chest X-ray images into **NORMAL** and **PNEUMONIA** classes using TensorFlow/Keras.
 
-The project was developed as an exploration of how machine learning can be applied to medical image classification and automated decision-support workflows.
+The project has evolved from an academic CNN experiment into a more reproducible ML workflow with model evaluation, explainability, automated tests, and an optional Streamlit demonstration interface.
 
-> ⚠️ **Medical disclaimer:** PneumonAi is an educational/research project and is **not a medical diagnostic device**. Its predictions should not be used to diagnose, treat, or make clinical decisions about a patient.
-
----
-
-## 🎯 Project Objective
-
-Pneumonia can require rapid assessment, and chest X-ray imaging is commonly used as part of the diagnostic process. PneumonAi investigates whether a CNN can learn visual patterns in chest X-ray images that distinguish pneumonia cases from normal cases.
-
-The original project reported approximately **96% accuracy** on its evaluation setup. This figure should be interpreted in the context of the dataset, preprocessing pipeline, model architecture, and evaluation methodology used in the project; it should **not** be interpreted as clinical diagnostic accuracy.
+> ⚠️ **Medical disclaimer:** PneumonAi is an educational/research project and is **not a medical diagnostic device**. Predictions must not be used to diagnose, treat, triage, or make clinical decisions about a patient.
 
 ---
 
-## 🧠 How It Works
+## ✨ What the project demonstrates
 
-The workflow is broadly:
+- 🧠 CNN-based medical image classification
+- 🔄 Reproducible training with a fixed random seed
+- 🧪 Precision, recall, F1-score and ROC-AUC evaluation
+- 🔥 Grad-CAM model explainability
+- 🖥️ Optional Streamlit demonstration interface
+- ✅ Automated smoke tests and GitHub Actions CI
+- 📦 Dependency management and repository hygiene
+
+---
+
+## 🧠 Pipeline
 
 ```text
-Chest X-Ray Image
-       ↓
-Image Preprocessing
-       ↓
-CNN Feature Extraction
-       ↓
-Classification Layer
-       ↓
-Pneumonia / Normal
+                  Chest X-Ray
+                       │
+                       ▼
+              Image Preprocessing
+                       │
+                       ▼
+              Data Augmentation
+                       │
+                       ▼
+                CNN Classifier
+                       │
+             ┌─────────┴─────────┐
+             ▼                   ▼
+        Probability         Grad-CAM
+             │                   │
+             ▼                   ▼
+       Classification      Visual Explanation
 ```
 
-The model uses:
-
-- Convolutional layers for feature extraction
-- Max pooling for spatial downsampling
-- A fully connected layer for classification
-- A sigmoid output for binary classification
-- Data augmentation during training
-- Binary cross-entropy loss
-- Adam optimization
-
-The training implementation is available in [`Code/train.py`](Code/train.py), while [`Code/test.py`](Code/test.py) demonstrates loading the trained model and making a prediction on a new image.
+The modern training pipeline uses 224×224 RGB inputs, convolutional feature extraction, pooling, dropout, binary cross-entropy, Adam optimization, early stopping, and checkpointing.
 
 ---
 
 ## 📊 Dataset
 
-The model was trained using the **Chest X-Ray Images (Pneumonia)** dataset published by Paul Mooney on Kaggle.
+The original project uses the **Chest X-Ray Images (Pneumonia)** dataset published by Paul Mooney on Kaggle.
 
-The original project used approximately:
+[Dataset on Kaggle](https://www.kaggle.com/paultimothymooney/chest-xray-pneumonia)
 
-- **5,200 training images**
-- **620 test images**
-- Two classes: **NORMAL** and **PNEUMONIA**
+The dataset is **not included in this repository**. Do not commit medical images, patient-identifiable information, trained model artifacts, or credentials.
 
-Dataset source:
+For the modern training pipeline, arrange the data as:
 
-[Chest X-Ray Images (Pneumonia) — Kaggle](https://www.kaggle.com/paultimothymooney/chest-xray-pneumonia)
+```text
+data/chest_xray/
+├── train/
+│   ├── NORMAL/
+│   └── PNEUMONIA/
+├── val/
+│   ├── NORMAL/
+│   └── PNEUMONIA/
+└── test/
+    ├── NORMAL/
+    └── PNEUMONIA/
+```
 
-The dataset is not included in this repository because of its size and licensing/distribution considerations.
+---
+
+## 🚀 Quick Start
+
+### 1. Clone
+
+```bash
+git clone https://github.com/kisaacnana/PneumonAi.git
+cd PneumonAi
+```
+
+### 2. Create a virtual environment
+
+```bash
+python -m venv .venv
+```
+
+Activate it on macOS/Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Windows:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Prepare the dataset
+
+Download the Kaggle dataset and arrange the folders using the structure above.
+
+### 5. Train
+
+```bash
+python Code/train_modern.py
+```
+
+The best model is saved to `artifacts/pneumonai.keras` and training plots are written to `artifacts/`.
+
+### 6. Evaluate
+
+```bash
+python Code/evaluate.py
+```
+
+The evaluation script reports precision, recall, F1-score, confusion matrix and ROC-AUC.
+
+### 7. Generate a Grad-CAM explanation
+
+Place a compatible X-ray at `sample_xray.png`, then run:
+
+```bash
+python Code/gradcam.py
+```
+
+The generated explanation is saved to `artifacts/gradcam.png`.
+
+> Grad-CAM is an interpretability aid. A highlighted region does **not** prove that the model is using clinically valid features.
+
+### 8. Run the demonstration app
+
+```bash
+streamlit run app.py
+```
+
+The app expects a trained model at `artifacts/pneumonai.keras`.
+
+---
+
+## 🧪 Testing
+
+Run the smoke tests with:
+
+```bash
+pytest -q
+```
+
+GitHub Actions automatically runs compilation checks and the test suite on pushes and pull requests to `master`.
 
 ---
 
 ## 📈 Results
 
-The repository includes training visualizations for model accuracy and loss:
-
-### Model Accuracy
+The repository retains the original project's training visualizations:
 
 ![Model Accuracy](Figures/accuracy_plot.png)
 
-### Model Loss
-
 ![Model Loss](Figures/loss_plot.png)
 
-These plots provide a visual representation of the model's training and validation performance over the training process.
+The original project reported approximately **96% accuracy** under its original evaluation setup. This number is preserved as historical project context only; it is **not** a result from the modern pipeline and must not be interpreted as clinical diagnostic accuracy.
+
+When the modern pipeline is trained, report its actual test-set metrics here rather than copying the historical result.
+
+---
+
+## 🔬 Evaluation Philosophy
+
+For a binary medical-image classifier, accuracy alone is insufficient. PneumonAi therefore exposes multiple metrics:
+
+| Metric | Why it matters |
+|---|---|
+| Precision | How often positive predictions are correct |
+| Recall / Sensitivity | How many positive cases are detected |
+| F1-score | Balance between precision and recall |
+| ROC-AUC | Ranking/discrimination performance across thresholds |
+| Confusion matrix | Shows the distribution of correct and incorrect predictions |
+
+These metrics still do **not** establish clinical validity, safety, fairness, or regulatory approval.
 
 ---
 
@@ -86,12 +194,22 @@ These plots provide a visual representation of the model's training and validati
 
 ```text
 PneumonAi/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── Code/
-│   ├── train.py          # Train and save the CNN model
-│   └── test.py           # Load the model and run predictions
-├── Figures/
-│   ├── accuracy_plot.png # Accuracy visualization
-│   └── loss_plot.png     # Loss visualization
+│   ├── train.py             # Original training implementation
+│   ├── test.py              # Original prediction implementation
+│   ├── train_modern.py      # Reproducible modern training pipeline
+│   ├── evaluate.py          # Evaluation metrics
+│   └── gradcam.py           # Grad-CAM explainability
+├── Figures/                 # Original project visualizations
+├── tests/
+│   └── test_smoke.py        # Model pipeline smoke tests
+├── app.py                   # Streamlit demonstration
+├── requirements.txt
+├── .gitignore
+├── CONTRIBUTING.md
 ├── LICENSE
 └── README.md
 ```
@@ -100,94 +218,52 @@ PneumonAi/
 
 ## 🛠️ Technology Stack
 
-- **Python**
-- **Keras / TensorFlow**
-- **NumPy**
-- **Matplotlib**
-- **Convolutional Neural Networks (CNN)**
-- **Computer Vision**
+**Machine Learning**  
+Python • TensorFlow • Keras • scikit-learn
+
+**Computer Vision**  
+OpenCV • Pillow • CNNs • Grad-CAM
+
+**Visualization**  
+Matplotlib • Streamlit
+
+**Engineering**  
+Git • GitHub Actions • pytest
 
 ---
 
-## 🚀 Getting Started
+## ⚠️ Limitations & Responsible Use
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/kisaacnana/PneumonAi.git
-cd PneumonAi
-```
-
-### 2. Install the required dependencies
-
-The original project does not currently include a pinned `requirements.txt`. For a reproducible setup, the dependencies used by the code include:
-
-```bash
-pip install tensorflow keras numpy matplotlib
-```
-
-### 3. Prepare the dataset
-
-Download the [Chest X-Ray Images (Pneumonia) dataset](https://www.kaggle.com/paultimothymooney/chest-xray-pneumonia) and arrange the training and test directories according to the paths expected by `Code/train.py`.
-
-### 4. Train the model
-
-```bash
-python Code/train.py
-```
-
-The training script saves the trained model as `pneumonia_model.h5` and generates accuracy/loss plots.
-
-### 5. Run a prediction
-
-Place a compatible image at the location expected by `Code/test.py`, ensure the trained model is available, and run:
-
-```bash
-python Code/test.py
-```
+- This is an educational/research project, not a clinical system.
+- Dataset size and composition limit generalization.
+- Dataset bias can affect model behavior across populations and imaging environments.
+- A held-out test result does not establish real-world clinical performance.
+- Accuracy, ROC-AUC and other aggregate metrics do not measure clinical safety.
+- Grad-CAM visualizations should not be interpreted as clinical evidence.
+- Real clinical deployment would require rigorous external validation, governance, privacy controls, risk management, human oversight, and applicable regulatory review.
 
 ---
 
-## 🔬 Limitations
+## 🔮 Future Roadmap
 
-This project has several important limitations:
-
-- The model is trained on a relatively small public dataset.
-- The architecture is intentionally simple and is not intended to represent a production-grade medical imaging system.
-- The evaluation setup does not establish clinical validity or generalization to real-world hospital populations.
-- Accuracy alone is insufficient for evaluating a medical classification model; metrics such as sensitivity, specificity, precision, recall, F1-score, ROC-AUC, and calibration would provide a more complete assessment.
-- The preprocessing and training configuration should be reproduced and independently validated before drawing conclusions from the reported performance.
-
----
-
-## 🔮 Future Improvements
-
-Potential next steps include:
-
-- Add a reproducible `requirements.txt` or modern dependency configuration
-- Introduce a dedicated validation set
-- Report a full set of classification metrics
-- Add a confusion matrix and ROC curve
-- Experiment with transfer learning using architectures such as ResNet or EfficientNet
-- Improve image preprocessing and augmentation
-- Add explainability methods such as Grad-CAM
-- Build a simple web interface for demonstration purposes
-- Add automated tests and CI with GitHub Actions
-
----
-
-## 📚 Background
-
-The original project was developed as a practical exploration of **machine learning, convolutional neural networks, and medical image classification**.
-
-For background information on pneumonia, see the [American Thoracic Society patient resources](https://www.thoracic.org/patients/patient-resources/resources/top-pneumonia-facts.pdf).
+- [x] Modernize training pipeline
+- [x] Add reproducible dependencies
+- [x] Add multi-metric evaluation
+- [x] Add Grad-CAM explainability
+- [x] Add Streamlit demonstration
+- [x] Add automated tests and CI
+- [ ] Add a documented data-splitting/preprocessing protocol
+- [ ] Add confusion-matrix and ROC plots as generated artifacts
+- [ ] Benchmark transfer-learning models such as ResNet/EfficientNet
+- [ ] Add experiment tracking
+- [ ] Add model versioning and reproducibility metadata
+- [ ] Add a deployment-ready API only after rigorous validation
 
 ---
 
 ## 👤 Author
 
-**Nana Ike**
-
+**Nana Ike**  
 Computer Engineer • Creative Developer • UI/UX & Motion Designer
 
 - GitHub: [@kisaacnana](https://github.com/kisaacnana)
@@ -198,4 +274,6 @@ Computer Engineer • Creative Developer • UI/UX & Motion Designer
 
 ## 📄 License
 
-See the [`LICENSE`](LICENSE) file for license information.
+See [`LICENSE`](LICENSE) for license information.
+
+> **Build. Design. Create. Solve.**
