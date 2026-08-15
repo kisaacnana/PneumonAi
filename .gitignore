@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# Data and generated model artifacts
+data/
+artifacts/
+*.h5
+*.keras
+*.ckpt
+
+# Generated plots
+accuracy.png
+loss.png
